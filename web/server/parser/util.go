@@ -12,8 +12,16 @@ import (
 //
 // For Go1.5 and greater the test output looks something like this:
 // --- PASS: TestOldSchool_PassesWithMessage (0.03s)
+//
+// For Go1.7 and greater sub-test output looks something like this:
+//     --- PASS: TestOldSchool_PassesWithMessage (0.03s)
 func parseTestFunctionDuration(line string) float64 {
 	line = strings.Replace(line, "(", "", 1)
+	// Check for go1.7 sub-tests
+
+	if strings.HasPrefix(line, "    ") {
+		line = strings.Replace(line, "    ", "", 1)
+	}
 	fields := strings.Split(line, " ")
 	timeStr := fields[3]+"s"
 	if strings.HasSuffix(timeStr, "s)s") {

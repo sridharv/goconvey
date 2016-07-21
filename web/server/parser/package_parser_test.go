@@ -132,6 +132,12 @@ func TestParsePackage_Golang15Output_ShouldNotPanic(t *testing.T) {
 	assertEqual(t, expectedGolang15, *actual)
 }
 
+func TestParsePackage_Golang17SubTests_Failing(t *testing.T) {
+	actual := &contract.PackageResult{PackageName: expectedGolang17Failing.PackageName}
+	ParsePackageResults(actual, inputGolang17Failing)
+	assertEqual(t, expectedGolang17Failing, *actual)
+}
+
 func assertEqual(t *testing.T, expected, actual interface{}) {
 	a, _ := json.Marshal(expected)
 	b, _ := json.Marshal(actual)
@@ -782,6 +788,80 @@ var expectedGolang15 = contract.PackageResult{
 		contract.TestResult{
 			TestName: "Golang15",
 			Elapsed:  0.01,
+			Passed:   true,
+			File:     "",
+			Line:     0,
+			Message:  "",
+			Stories:  []reporting.ScopeResult{},
+		},
+	},
+}
+
+const inputGolang17Failing = `
+=== RUN   TestPreGo17
+--- PASS: TestPreGo17 (0.00s)
+=== RUN   TestSubTests
+Fake printed line 1
+Fake printed line 2
+=== RUN   TestSubTests/RequestLogging
+Some logs for the RequestLogging test
+Some more logs for the RequestLogging test
+=== RUN   TestSubTests/RequestFail
+2016/07/21 11:27:02 INFO: received bad request: validation failed
+=== RUN   TestSubTests/RequestSuccess
+--- FAIL: TestSubTests (0.30s)
+    --- PASS: TestSubTests/RequestLogging (0.00s)
+    --- FAIL: TestSubTests/RequestFail (0.10s)
+	    sub_test.go:18: I am a failing test.
+    --- PASS: TestSubTests/RequestSuccess (0.20s)
+FAIL
+exit status 1
+FAIL  	github.com/smartystreets/goconvey/webserver/examples	0.30s
+`
+
+var expectedGolang17Failing = contract.PackageResult{
+	PackageName: "github.com/smartystreets/goconvey/webserver/examples",
+	Elapsed:     0.00,
+	TestResults: []contract.TestResult{
+		contract.TestResult{
+			TestName: "TestPreGo17",
+			Elapsed:  0.00,
+			Passed:   true,
+			File:     "",
+			Line:     0,
+			Message:  "",
+			Stories:  []reporting.ScopeResult{},
+		},
+		contract.TestResult{
+			TestName: "TestSubTests",
+			Elapsed:  0.30,
+			Passed:   false,
+			File:     "",
+			Line:     0,
+			Message:  "Fake printed line 1\nFake printed line 2",
+			Stories:  []reporting.ScopeResult{},
+		},
+		contract.TestResult{
+			TestName: "TestSubTests/RequestFail",
+			Elapsed:  0.10,
+			Passed:   false,
+			File:     "sub_test.go",
+			Line:     18,
+			Message:  "2016/07/21 11:27:02 INFO: received bad request: validation failed\n    sub_test.go:18: I am a failing test.",
+			Stories:  []reporting.ScopeResult{},
+		},
+		contract.TestResult{
+			TestName: "TestSubTests/RequestLogging",
+			Elapsed:  0.00,
+			Passed:   true,
+			File:     "",
+			Line:     0,
+			Message:  "Some logs for the RequestLogging test\nSome more logs for the RequestLogging test",
+			Stories:  []reporting.ScopeResult{},
+		},
+		contract.TestResult{
+			TestName: "TestSubTests/RequestSuccess",
+			Elapsed:  0.20,
 			Passed:   true,
 			File:     "",
 			Line:     0,

@@ -80,7 +80,6 @@ func (self *outputParser) recordFinalOutcome(outcome string) {
 func (self *outputParser) processTestOutput() {
 	if isNewTest(self.line) {
 		self.registerTestFunction()
-
 	} else if isTestResult(self.line) {
 		self.recordTestMetadata()
 
@@ -100,11 +99,12 @@ func (self *outputParser) registerTestFunction() {
 	self.testMap[self.test.TestName] = self.test
 }
 func (self *outputParser) recordTestMetadata() {
-	testName := strings.Split(self.line, " ")[2]
+	trimmed := strings.TrimSpace(self.line)
+	testName := strings.Split(trimmed, " ")[2]
 	if test, ok := self.testMap[testName]; ok {
 		self.test = test
-		self.test.Passed = !strings.HasPrefix(self.line, "--- FAIL: ")
-		self.test.Skipped = strings.HasPrefix(self.line, "--- SKIP: ")
+		self.test.Passed = !strings.HasPrefix(trimmed, "--- FAIL: ")
+		self.test.Skipped = strings.HasPrefix(trimmed, "--- SKIP: ")
 		self.test.Elapsed = parseTestFunctionDuration(self.line)
 	}
 }
